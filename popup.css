@@ -1,0 +1,10 @@
+body { font-family: Arial, sans-serif; margin:0; padding:10px; width:320px; color:#111; }
+.container header { display:flex; align-items:center; gap:10px; }
+.container header h1 { font-size:18px; margin:0; }
+.muted { color:#666; font-size:12px; margin-top:8px; }
+.score { font-size:22px; font-weight:700; margin:10px 0; }
+.primary { width:100%; padding:8px; border-radius:6px; background:#0b84ff; color:#fff; border:none; cursor:pointer; }
+.secondary { width:100%; padding:8px; border-radius:6px; background:#fff; color:#111; border:1px solid #ddd; cursor:pointer; margin-top:6px; }
+#flagged-list { list-style:none; padding:0; margin:8px 0 0 0; max-height:120px; overflow:auto; }
+#flagged-list li { padding:6px 0; border-bottom:1px solid #f1f1f1; font-size:13px; }
+footer { margin-top:8px; font-size:12px; text-align:right; }
