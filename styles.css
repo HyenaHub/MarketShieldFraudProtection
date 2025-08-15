@@ -1,0 +1,366 @@
+/* Content script styles for MarketShield fraud detection overlays */
+
+/* Warning overlays for listings */
+.marketshield-warning {
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid #ff4757;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+  max-width: 250px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  backdrop-filter: blur(4px);
+}
+
+.marketshield-warning.marketshield-high {
+  border-color: #ff4757;
+  background: rgba(255, 71, 87, 0.1);
+}
+
+.marketshield-warning.marketshield-medium {
+  border-color: #ffa502;
+  background: rgba(255, 165, 2, 0.1);
+}
+
+.marketshield-warning.marketshield-low {
+  border-color: #f1c40f;
+  background: rgba(241, 196, 15, 0.1);
+}
+
+.marketshield-warning-content {
+  font-size: 12px;
+}
+
+.marketshield-warning-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.marketshield-warning-icon {
+  font-size: 16px;
+}
+
+.marketshield-warning-title {
+  font-weight: 700;
+  color: #2c3e50;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.marketshield-warning-details {
+  margin-bottom: 10px;
+  color: #5a6c7d;
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.marketshield-warning-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.marketshield-btn {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.marketshield-btn-report {
+  background: #ff4757;
+  color: white;
+}
+
+.marketshield-btn-report:hover {
+  background: #ff3742;
+  transform: translateY(-1px);
+}
+
+.marketshield-btn-dismiss {
+  background: #f1f2f6;
+  color: #57606f;
+}
+
+.marketshield-btn-dismiss:hover {
+  background: #ddd;
+  transform: translateY(-1px);
+}
+
+/* Page-level warning banner */
+.marketshield-page-warning {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #ff4757 0%, #ff3742 100%);
+  color: white;
+  padding: 16px 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 99999;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  border-bottom: 3px solid #ff3742;
+}
+
+.marketshield-page-warning.marketshield-medium {
+  background: linear-gradient(135deg, #ffa502 0%, #ff9f00 100%);
+  border-bottom-color: #ff9f00;
+}
+
+.marketshield-page-warning.marketshield-low {
+  background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%);
+  border-bottom-color: #f39c12;
+}
+
+.marketshield-page-warning-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.marketshield-page-warning .marketshield-warning-header {
+  margin-bottom: 12px;
+}
+
+.marketshield-page-warning .marketshield-warning-title {
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: none;
+}
+
+.marketshield-page-warning .marketshield-warning-icon {
+  font-size: 22px;
+}
+
+.marketshield-page-warning .marketshield-warning-details {
+  margin-bottom: 16px;
+  font-size: 14px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.marketshield-page-warning .marketshield-warning-details p {
+  margin-bottom: 4px;
+}
+
+.marketshield-page-warning .marketshield-warning-actions {
+  gap: 12px;
+}
+
+.marketshield-page-warning .marketshield-btn {
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.marketshield-page-warning .marketshield-btn-report {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.marketshield-page-warning .marketshield-btn-report:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.marketshield-page-warning .marketshield-btn-dismiss {
+  background: transparent;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.marketshield-page-warning .marketshield-btn-dismiss:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Risk indicators for listings */
+.marketshield-risk-indicator {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  z-index: 1000;
+  border: 2px solid white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.marketshield-risk-indicator.risk-high {
+  background: #ff4757;
+}
+
+.marketshield-risk-indicator.risk-medium {
+  background: #ffa502;
+}
+
+.marketshield-risk-indicator.risk-low {
+  background: #f1c40f;
+}
+
+/* Listing dimming for high-risk items */
+.marketshield-listing-dimmed {
+  opacity: 0.6;
+  filter: grayscale(30%);
+  transition: all 0.3s ease;
+}
+
+.marketshield-listing-dimmed:hover {
+  opacity: 0.8;
+  filter: grayscale(10%);
+}
+
+/* Loading indicator */
+.marketshield-loading {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #667eea;
+  border-radius: 50%;
+  animation: marketshield-spin 1s linear infinite;
+  z-index: 1000;
+}
+
+@keyframes marketshield-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Notifications */
+.marketshield-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 99999;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  max-width: 300px;
+  animation: marketshield-slide-in 0.3s ease-out;
+}
+
+.marketshield-notification-success {
+  background: #2ed573;
+  color: white;
+}
+
+.marketshield-notification-error {
+  background: #ff4757;
+  color: white;
+}
+
+.marketshield-notification-warning {
+  background: #ffa502;
+  color: white;
+}
+
+.marketshield-notification-info {
+  background: #667eea;
+  color: white;
+}
+
+@keyframes marketshield-slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Seller risk indicators */
+.marketshield-seller-warning {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255, 71, 87, 0.1);
+  color: #ff4757;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  margin-left: 8px;
+  border: 1px solid rgba(255, 71, 87, 0.3);
+}
+
+.marketshield-seller-warning-icon {
+  font-size: 8px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .marketshield-page-warning {
+    padding: 12px 16px;
+  }
+  
+  .marketshield-page-warning .marketshield-warning-title {
+    font-size: 16px;
+  }
+  
+  .marketshield-page-warning .marketshield-warning-details {
+    font-size: 13px;
+  }
+  
+  .marketshield-warning {
+    max-width: 200px;
+    padding: 10px;
+  }
+  
+  .marketshield-notification {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .marketshield-warning {
+    border-width: 3px;
+    background: white;
+  }
+  
+  .marketshield-page-warning {
+    border-bottom-width: 4px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .marketshield-warning,
+  .marketshield-btn,
+  .marketshield-listing-dimmed,
+  .marketshield-notification {
+    transition: none;
+  }
+  
+  .marketshield-loading {
+    animation: none;
+  }
+  
+  @keyframes marketshield-spin {
+    0%, 100% { transform: rotate(0deg); }
+  }
+  
+  @keyframes marketshield-slide-in {
+    from, to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+}
