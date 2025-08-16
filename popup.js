@@ -10,100 +10,199 @@ class PopupManager {
   }
   
   async init() {
-    await this.loadSettings();
-    await this.loadStats();
-    
-    this.setupEventListeners();
-    this.updateUI();
-    this.startStatsUpdater();
+    try {
+      console.log('MarketShield popup initializing...');
+      await this.loadSettings();
+      await this.loadStats();
+      
+      this.setupEventListeners();
+      this.updateUI();
+      this.startStatsUpdater();
+      console.log('MarketShield popup initialized successfully');
+    } catch (error) {
+      console.error('MarketShield popup initialization failed:', error);
+    }
   }
   
   async loadSettings() {
     return new Promise((resolve) => {
-      chrome.runtime.sendMessage({ action: 'getUserSettings' }, (response) => {
-        if (response && response.success) {
-          this.settings = response.data;
-        }
+      try {
+        chrome.runtime.sendMessage({ action: 'getUserSettings' }, (response) => {
+          if (chrome.runtime.lastError) {
+            console.error('Chrome runtime error:', chrome.runtime.lastError.message);
+            // Use default settings
+            this.settings = {
+              enabled: true,
+              alertLevel: 'medium',
+              autoReport: false,
+              apiEndpoint: 'https://marketshieldfraudprotection.replit.app'
+            };
+          } else if (response && response.success) {
+            this.settings = response.data;
+          } else {
+            console.warn('Failed to load settings, using defaults');
+            this.settings = {
+              enabled: true,
+              alertLevel: 'medium',
+              autoReport: false,
+              apiEndpoint: 'https://marketshieldfraudprotection.replit.app'
+            };
+          }
+          resolve();
+        });
+      } catch (error) {
+        console.error('Error loading settings:', error);
+        this.settings = {
+          enabled: true,
+          alertLevel: 'medium',
+          autoReport: false,
+          apiEndpoint: 'https://marketshieldfraudprotection.replit.app'
+        };
         resolve();
-      });
+      }
     });
   }
   
   async loadStats() {
     return new Promise((resolve) => {
-      chrome.runtime.sendMessage({ action: 'getStats' }, (response) => {
-        if (response && response.success) {
-          this.stats = response.data;
-        }
+      try {
+        chrome.runtime.sendMessage({ action: 'getStats' }, (response) => {
+          if (chrome.runtime.lastError) {
+            console.error('Chrome runtime error loading stats:', chrome.runtime.lastError.message);
+            this.stats = {
+              totalAnalyses: 0,
+              fraudDetected: 0,
+              reportsSubmitted: 0,
+              lastAnalysis: null
+            };
+          } else if (response && response.success) {
+            this.stats = response.data;
+          } else {
+            console.warn('Failed to load stats, using defaults');
+            this.stats = {
+              totalAnalyses: 0,
+              fraudDetected: 0,
+              reportsSubmitted: 0,
+              lastAnalysis: null
+            };
+          }
+          resolve();
+        });
+      } catch (error) {
+        console.error('Error loading stats:', error);
+        this.stats = {
+          totalAnalyses: 0,
+          fraudDetected: 0,
+          reportsSubmitted: 0,
+          lastAnalysis: null
+        };
         resolve();
-      });
+      }
     });
   }
   
   setupEventListeners() {
     // Main toggle
     const enableToggle = document.getElementById('enableToggle');
-    enableToggle.addEventListener('change', (e) => {
-      this.updateSetting('enabled', e.target.checked);
-      this.updateStatusIndicator();
-    });
+    if (enableToggle) {
+      enableToggle.addEventListener('change', (e) => {
+        this.updateSetting('enabled', e.target.checked);
+        this.updateStatusIndicator();
+      });
+    }
     
     // Alert level selector
     const alertLevel = document.getElementById('alertLevel');
-    alertLevel.addEventListener('change', (e) => {
-      this.updateSetting('alertLevel', e.target.value);
-    });
+    if (alertLevel) {
+      alertLevel.addEventListener('change', (e) => {
+        this.updateSetting('alertLevel', e.target.value);
+      });
+    }
     
     // Action buttons
-    document.getElementById('reportCurrentPage').addEventListener('click', () => {
-      this.reportCurrentPage();
-    });
+    const reportCurrentPage = document.getElementById('reportCurrentPage');
+    if (reportCurrentPage) {
+      reportCurrentPage.addEventListener('click', () => {
+        this.reportCurrentPage();
+      });
+    }
     
-    document.getElementById('viewSettings').addEventListener('click', () => {
-      this.openSettingsModal();
-    });
+    const viewSettings = document.getElementById('viewSettings');
+    if (viewSettings) {
+      viewSettings.addEventListener('click', () => {
+        this.openSettingsModal();
+      });
+    }
     
     // Settings modal
-    document.getElementById('closeSettings').addEventListener('click', () => {
-      this.closeSettingsModal();
-    });
+    const closeSettings = document.getElementById('closeSettings');
+    if (closeSettings) {
+      closeSettings.addEventListener('click', () => {
+        this.closeSettingsModal();
+      });
+    }
     
-    document.getElementById('cancelSettings').addEventListener('click', () => {
-      this.closeSettingsModal();
-    });
+    const cancelSettings = document.getElementById('cancelSettings');
+    if (cancelSettings) {
+      cancelSettings.addEventListener('click', () => {
+        this.closeSettingsModal();
+      });
+    }
     
-    document.getElementById('saveSettings').addEventListener('click', () => {
-      this.saveAdvancedSettings();
-    });
+    const saveSettings = document.getElementById('saveSettings');
+    if (saveSettings) {
+      saveSettings.addEventListener('click', () => {
+        this.saveAdvancedSettings();
+      });
+    }
     
     // Footer links
-    document.getElementById('helpLink').addEventListener('click', (e) => {
-      e.preventDefault();
-      chrome.tabs.create({ url: 'https://marketshieldfraudprotection.replit.app/help' });
-    });
+    const helpLink = document.getElementById('helpLink');
+    if (helpLink) {
+      helpLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        chrome.tabs.create({ url: 'https://marketshieldfraudprotection.replit.app/help' });
+      });
+    }
     
-    document.getElementById('privacyLink').addEventListener('click', (e) => {
-      e.preventDefault();
-      chrome.tabs.create({ url: 'https://marketshieldfraudprotection.replit.app/privacy' });
-    });
+    const privacyLink = document.getElementById('privacyLink');
+    if (privacyLink) {
+      privacyLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        chrome.tabs.create({ url: 'https://marketshieldfraudprotection.replit.app/privacy' });
+      });
+    }
     
-    document.getElementById('feedbackLink').addEventListener('click', (e) => {
-      e.preventDefault();
-      chrome.tabs.create({ url: 'https://marketshieldfraudprotection.replit.app/feedback' });
-    });
+    const feedbackLink = document.getElementById('feedbackLink');
+    if (feedbackLink) {
+      feedbackLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        chrome.tabs.create({ url: 'https://marketshieldfraudprotection.replit.app/feedback' });
+      });
+    }
     
     // Modal overlay click to close
-    document.getElementById('settingsModal').addEventListener('click', (e) => {
-      if (e.target.id === 'settingsModal') {
-        this.closeSettingsModal();
-      }
-    });
+    const settingsModal = document.getElementById('settingsModal');
+    if (settingsModal) {
+      settingsModal.addEventListener('click', (e) => {
+        if (e.target.id === 'settingsModal') {
+          this.closeSettingsModal();
+        }
+      });
+    }
   }
   
   updateUI() {
     // Update toggle states
-    document.getElementById('enableToggle').checked = this.settings.enabled;
-    document.getElementById('alertLevel').value = this.settings.alertLevel || 'medium';
+    const enableToggle = document.getElementById('enableToggle');
+    if (enableToggle) {
+      enableToggle.checked = this.settings.enabled;
+    }
+    
+    const alertLevel = document.getElementById('alertLevel');
+    if (alertLevel) {
+      alertLevel.value = this.settings.alertLevel || 'medium';
+    }
     
     // Update status indicator
     this.updateStatusIndicator();
@@ -112,34 +211,57 @@ class PopupManager {
     this.updateStats();
     
     // Update settings modal
-    document.getElementById('autoReportToggle').checked = this.settings.autoReport;
-    document.getElementById('apiEndpoint').value = this.settings.apiEndpoint || '';
+    const autoReportToggle = document.getElementById('autoReportToggle');
+    if (autoReportToggle) {
+      autoReportToggle.checked = this.settings.autoReport;
+    }
+    
+    const apiEndpoint = document.getElementById('apiEndpoint');
+    if (apiEndpoint) {
+      apiEndpoint.value = this.settings.apiEndpoint || '';
+    }
   }
   
   updateStatusIndicator() {
     const indicator = document.getElementById('statusIndicator');
+    if (!indicator) return;
+    
     const statusDot = indicator.querySelector('.status-dot');
     const statusText = indicator.querySelector('.status-text');
     
-    if (this.settings.enabled) {
-      statusDot.className = 'status-dot active';
-      statusText.textContent = 'Active';
-    } else {
-      statusDot.className = 'status-dot inactive';
-      statusText.textContent = 'Inactive';
+    if (statusDot && statusText) {
+      if (this.settings.enabled) {
+        statusDot.className = 'status-dot active';
+        statusText.textContent = 'Active';
+      } else {
+        statusDot.className = 'status-dot inactive';
+        statusText.textContent = 'Inactive';
+      }
     }
   }
   
   updateStats() {
-    document.getElementById('totalAnalyses').textContent = this.stats.totalAnalyses || 0;
-    document.getElementById('fraudDetected').textContent = this.stats.fraudDetected || 0;
-    document.getElementById('reportsSubmitted').textContent = this.stats.reportsSubmitted || 0;
+    const totalAnalyses = document.getElementById('totalAnalyses');
+    if (totalAnalyses) {
+      totalAnalyses.textContent = this.stats.totalAnalyses || 0;
+    }
+    
+    const fraudDetected = document.getElementById('fraudDetected');
+    if (fraudDetected) {
+      fraudDetected.textContent = this.stats.fraudDetected || 0;
+    }
+    
+    const reportsSubmitted = document.getElementById('reportsSubmitted');
+    if (reportsSubmitted) {
+      reportsSubmitted.textContent = this.stats.reportsSubmitted || 0;
+    }
     
     this.updateRecentActivity();
   }
   
   updateRecentActivity() {
     const activityContainer = document.getElementById('recentActivity');
+    if (!activityContainer) return;
     
     if (this.stats.lastAnalysis) {
       const lastAnalysisTime = new Date(this.stats.lastAnalysis);
@@ -242,21 +364,38 @@ class PopupManager {
   
   openSettingsModal() {
     // Load current settings into modal
-    document.getElementById('autoReportToggle').checked = this.settings.autoReport;
-    document.getElementById('apiEndpoint').value = this.settings.apiEndpoint || '';
+    const autoReportToggle = document.getElementById('autoReportToggle');
+    if (autoReportToggle) {
+      autoReportToggle.checked = this.settings.autoReport;
+    }
+    
+    const apiEndpoint = document.getElementById('apiEndpoint');
+    if (apiEndpoint) {
+      apiEndpoint.value = this.settings.apiEndpoint || '';
+    }
     
     // Show modal
-    document.getElementById('settingsModal').style.display = 'flex';
+    const settingsModal = document.getElementById('settingsModal');
+    if (settingsModal) {
+      settingsModal.style.display = 'flex';
+    }
   }
   
   closeSettingsModal() {
-    document.getElementById('settingsModal').style.display = 'none';
+    const settingsModal = document.getElementById('settingsModal');
+    if (settingsModal) {
+      settingsModal.style.display = 'none';
+    }
   }
   
   async saveAdvancedSettings() {
-    const autoReport = document.getElementById('autoReportToggle').checked;
-    const apiEndpoint = document.getElementById('apiEndpoint').value.trim();
-    const apiKey = document.getElementById('apiKey').value.trim();
+    const autoReportToggle = document.getElementById('autoReportToggle');
+    const apiEndpointEl = document.getElementById('apiEndpoint');
+    const apiKeyEl = document.getElementById('apiKey');
+    
+    const autoReport = autoReportToggle ? autoReportToggle.checked : false;
+    const apiEndpoint = apiEndpointEl ? apiEndpointEl.value.trim() : '';
+    const apiKey = apiKeyEl ? apiKeyEl.value.trim() : '';
     
     const newSettings = {
       autoReport: autoReport,
