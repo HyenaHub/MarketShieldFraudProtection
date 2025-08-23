@@ -98,6 +98,46 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+        document.addEventListener("DOMContentLoaded", () => {
+  const realtimeToggle = document.getElementById("realtimeToggle");
+  const reportBtn = document.getElementById("reportBtn");
+  const listingsCount = document.getElementById("listingsCount");
+  const fraudCount = document.getElementById("fraudCount");
+  const reportsCount = document.getElementById("reportsCount");
+  const activityLog = document.getElementById("activityLog");
+
+  let stats = { listings: 0, fraud: 0, reports: 0 };
+
+  // Toggle realtime protection
+  realtimeToggle.addEventListener("change", () => {
+    const status = realtimeToggle.checked ? "enabled" : "disabled";
+    activityLog.innerText = `✅ Real-time protection ${status}`;
+  });
+
+  // Report current page
+  reportBtn.addEventListener("click", () => {
+    stats.reports++;
+    reportsCount.innerText = stats.reports;
+    activityLog.innerText = `🚩 Report submitted for this page`;
+  });
+
+  // Simulate scanning (placeholder - real logic would hook into background.js)
+  function simulateScan() {
+    stats.listings++;
+    if (Math.random() < 0.2) {
+      stats.fraud++;
+      activityLog.innerText = "⚠️ Fraud detected on this page!";
+    } else {
+      activityLog.innerText = "✅ Page scanned: No fraud detected";
+    }
+    listingsCount.innerText = stats.listings;
+    fraudCount.innerText = stats.fraud;
+  }
+
+  // Run scan when popup opens
+  simulateScan();
+});
+
 
       }
     });
