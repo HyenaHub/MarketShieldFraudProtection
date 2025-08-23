@@ -68,6 +68,18 @@
     <a href="#" id="privacyLink">Privacy</a> |
     <a href="#" id="feedbackLink">Feedback</a>
   </footer>
+<input type="checkbox" id="protection-toggle" checked />
+<select id="alert-sensitivity">
+  <option value="high">High - Strict</option>
+  <option value="medium" selected>Medium - Moderate risk+</option>
+  <option value="low">Low - Lenient</option>
+</select>
+<button id="report-page">Report Current Page</button>
+
+<!-- Stats -->
+<div id="listings-count">0</div>
+<div id="fraud-count">0</div>
+<div id="reports-count">0</div>
 
   <!-- Scripts -->
   <script src="popup.js"></script>
