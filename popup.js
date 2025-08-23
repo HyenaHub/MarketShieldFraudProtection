@@ -1,57 +1,38 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const toggle = document.getElementById("protection-toggle");
-  const sensitivity = document.getElementById("alert-sensitivity");
-  const reportBtn = document.getElementById("report-page");
+  const protectionToggle = document.getElementById("protectionToggle");
+  const sensitivitySelect = document.getElementById("sensitivity");
+  const reportBtn = document.getElementById("reportBtn");
 
-  const listingsCount = document.getElementById("listings-count");
-  const fraudCount = document.getElementById("fraud-count");
-  const reportsCount = document.getElementById("reports-count");
-
-  // Load settings from background
-  chrome.runtime.sendMessage({ action: "getUserSettings" }, (response) => {
-    if (response.success) {
-      toggle.checked = response.data.enabled;
-      sensitivity.value = response.data.alertLevel;
-    }
+  // Load saved state
+  chrome.storage.sync.get(["protectionEnabled", "sensitivity"], (data) => {
+    protectionToggle.checked = data.protectionEnabled ?? true;
+    sensitivitySelect.value = data.sensitivity ?? "medium";
   });
 
-  // Load stats
-  chrome.runtime.sendMessage({ action: "getStats" }, (response) => {
-    if (response.success) {
-      listingsCount.textContent = response.data.totalAnalyses || 0;
-      fraudCount.textContent = response.data.fraudDetected || 0;
-      reportsCount.textContent = response.data.reportsSubmitted || 0;
-    }
+  // Toggle real-time protection
+  protectionToggle.addEventListener("change", () => {
+    chrome.storage.sync.set({ protectionEnabled: protectionToggle.checked });
   });
 
-  // Handle toggle
-  toggle.addEventListener("change", () => {
-    chrome.runtime.sendMessage({
-      action: "updateSettings",
-      data: { enabled: toggle.checked }
-    }, () => {
-      chrome.runtime.sendMessage({ action: "settingsUpdated" });
-    });
+  // Change sensitivity
+  sensitivitySelect.addEventListener("change", () => {
+    chrome.storage.sync.set({ sensitivity: sensitivitySelect.value });
   });
 
-  // Handle sensitivity dropdown
-  sensitivity.addEventListener("change", () => {
-    chrome.runtime.sendMessage({
-      action: "updateSettings",
-      data: { alertLevel: sensitivity.value }
-    }, () => {
-      chrome.runtime.sendMessage({ action: "settingsUpdated" });
-    });
-  });
-
-  // Handle "Report Current Page"
+  // Report current page
   reportBtn.addEventListener("click", () => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      chrome.runtime.sendMessage({
-        action: "reportFraud",
-        data: { url: tabs[0].url }
-      }, (response) => {
-        alert(response.success ? "Reported!" : "Failed to report");
+      const activeTab = tabs[0];
+
+      // Send message to content script
+      chrome.tabs.sendMessage(activeTab.id, { action: "reportPage" }, (response) => {
+        if (response && response.success) {
+          let reportsEl = document.getElementById("reportsSubmitted");
+          reportsEl.textContent = parseInt(reportsEl.textContent) + 1;
+          alert("Page reported successfully!");
+        } else {
+          alert("Failed to report page.");
+        }
       });
     });
   });
