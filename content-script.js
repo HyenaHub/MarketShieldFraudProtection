@@ -498,3 +498,18 @@ if (document.readyState === 'loading') {
 } else {
   new MarketplaceMonitor();
 }
+scanForListings() {
+  if (!this.isEnabled) return; // ✅ already exists, but make sure it respects popup toggle
+  ...
+}
+async loadSettings() {
+  return new Promise((resolve) => {
+    chrome.runtime.sendMessage({ action: 'getUserSettings' }, (response) => {
+      if (response.success) {
+        this.settings = response.data;
+        this.isEnabled = this.settings.enabled;  // ✅ toggle from popup
+      }
+      resolve();
+    });
+  });
+}
