@@ -210,6 +210,28 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       target: { tabId: tabId },
       files: ['utils/api.js', 'utils/dom-utils.js', 'content-script.js']
     }).catch(error => {
+      // Auto-analyze marketplace listings when user visits
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.status === 'complete' && 
+      tab.url && 
+      tab.url.includes('facebook.com/marketplace')) {
+    
+    // Inject content script to scrape listing data
+    chrome.scripting.executeScript({
+      target: { tabId },
+      files: ['utils/api.js', 'utils/dom-utils.js', 'content-script.js']
+    }).catch(error => {
+      console.log('Content script already injected or failed:', error.message);
+    });
+
+    // Trigger background analysis (dummy example, replace with real data from content script)
+    chrome.runtime.sendMessage({
+      action: 'analyzeListing',
+      data: { url: tab.url }
+    });
+  }
+});
+
       console.log('Content script already injected or failed:', error.message);
     });
   }
