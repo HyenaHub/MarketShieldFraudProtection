@@ -33,6 +33,39 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
           alert("Failed to report page.");
         }
+        // popup.js
+
+document.addEventListener("DOMContentLoaded", () => {
+  const reportBtn = document.getElementById("reportBtn"); // Make sure popup.html has this button
+  const statusEl = document.getElementById("status"); // Optional: for feedback
+
+  if (reportBtn) {
+    reportBtn.addEventListener("click", () => {
+      // Get the current active tab
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs[0]?.id) {
+          chrome.tabs.sendMessage(
+            tabs[0].id,
+            { action: "reportCurrentPage" },
+            (response) => {
+              if (chrome.runtime.lastError) {
+                console.error("Message failed:", chrome.runtime.lastError.message);
+                if (statusEl) statusEl.textContent = "❌ Failed to report page";
+              } else if (response?.success) {
+                console.log("Report success:", response.data);
+                if (statusEl) statusEl.textContent = "✅ Report sent!";
+              } else {
+                console.error("Report error:", response?.error);
+                if (statusEl) statusEl.textContent = "⚠️ Error sending report";
+              }
+            }
+          );
+        }
+      });
+    });
+  }
+});
+
       });
     });
   });
