@@ -53,6 +53,52 @@ document.addEventListener("DOMContentLoaded", () => {
         activityLog.innerText = e.target.checked
           ? "✅ Real-time protection enabled"
           : "⏸ Real-time protection disabled";
+        document.addEventListener("DOMContentLoaded", () => {
+  // Real-time protection toggle
+  const toggle = document.getElementById("protection-toggle");
+  toggle.addEventListener("change", () => {
+    chrome.runtime.sendMessage({
+      action: "updateSettings",
+      data: { enabled: toggle.checked }
+    }, () => {
+      // notify content scripts
+      chrome.runtime.sendMessage({ action: "settingsUpdated" });
+    });
+  });
+
+  // Sensitivity dropdown
+  const sensitivity = document.getElementById("alert-sensitivity");
+  sensitivity.addEventListener("change", () => {
+    chrome.runtime.sendMessage({
+      action: "updateSettings",
+      data: { alertLevel: sensitivity.value }
+    }, () => {
+      chrome.runtime.sendMessage({ action: "settingsUpdated" });
+    });
+  });
+
+  // Report Current Page button
+  document.getElementById("report-page").addEventListener("click", () => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.runtime.sendMessage({
+        action: "reportFraud",
+        data: { url: tabs[0].url }
+      }, (response) => {
+        alert(response.success ? "Reported!" : "Failed to report");
+      });
+    });
+  });
+
+  // Load stats
+  chrome.runtime.sendMessage({ action: "getStats" }, (response) => {
+    if (response.success) {
+      document.getElementById("listings-count").textContent = response.data.totalAnalyses;
+      document.getElementById("fraud-count").textContent = response.data.fraudDetected;
+      document.getElementById("reports-count").textContent = response.data.reportsSubmitted;
+    }
+  });
+});
+
       }
     });
   });
