@@ -1,87 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>MarketShield</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 10px; width: 300px; }
-    .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; }
-    .status-dot.active { background: green; }
-    .status-dot.inactive { background: red; }
-  </style>
+  <link rel="stylesheet" href="popup.css" />
 </head>
-<body class="popup-container">
-  <h2>MarketShield</h2>
+<body>
+  <div id="popup-container">
+    <!-- Header -->
+    <div id="header">
+      <img src="icons/logo.png" alt="MarketShield Logo" id="logo" />
+      <h1>MarketShield</h1>
+    </div>
 
-  <!-- Toggle -->
-  <label>
-    <input type="checkbox" id="enableToggle"> Enable Protection
-  </label>
-  <div id="statusIndicator">
-    <span class="status-dot inactive"></span>
-    <span class="status-text">Inactive</span>
-  </div>
+    <!-- Protection Toggle -->
+    <div class="section">
+      <label>
+        <input type="checkbox" id="protection-toggle" checked />
+        Real-time Protection
+      </label>
+    </div>
 
-  <!-- Alert level -->
-  <div>
-    <label for="alertLevel">Alert Level:</label>
-    <select id="alertLevel">
-      <option value="low">Low</option>
-      <option value="medium" selected>Medium</option>
-      <option value="high">High</option>
-    </select>
-  </div>
+    <!-- Sensitivity Setting -->
+    <div class="section">
+      <label for="alert-sensitivity">Alert Sensitivity:</label>
+      <select id="alert-sensitivity">
+        <option value="high">High - Strict</option>
+        <option value="medium" selected>Medium - Moderate risk+</option>
+        <option value="low">Low - Lenient</option>
+      </select>
+    </div>
 
-  <!-- Buttons -->
-  <button id="reportCurrentPage">Report Current Page</button>
-  <button id="viewSettings">Settings</button>
+    <!-- Stats -->
+    <div class="section">
+      <h2>Statistics</h2>
+      <ul>
+        <li>Listings Analyzed: <span id="listings-count">0</span></li>
+        <li>Fraud Detected: <span id="fraud-count">0</span></li>
+        <li>Reports Submitted: <span id="reports-count">0</span></li>
+      </ul>
+    </div>
 
-  <!-- Stats -->
-  <div>
-    <p>Total Analyses: <span id="totalAnalyses">0</span></p>
-    <p>Fraud Detected: <span id="fraudDetected">0</span></p>
-    <p>Reports Submitted: <span id="reportsSubmitted">0</span></p>
-  </div>
-
-  <div id="recentActivity"></div>
-
-  <!-- Settings Modal (hidden initially) -->
-  <div id="settingsModal" style="display:none; position:fixed; top:0; left:0; 
-      width:100%; height:100%; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;">
-    <div style="background:#fff; padding:20px; border-radius:10px; width:250px;">
-      <h3>Settings</h3>
-      <label><input type="checkbox" id="autoReportToggle"> Auto Report</label>
-      <br><br>
-      <input id="apiEndpoint" placeholder="API Endpoint">
-      <br><br>
-      <input id="apiKey" placeholder="API Key">
-      <br><br>
-      <button id="saveSettings">Save</button>
-      <button id="cancelSettings">Cancel</button>
-      <button id="closeSettings">Close</button>
+    <!-- Report Button -->
+    <div class="section">
+      <button id="report-page">Report Current Page</button>
     </div>
   </div>
 
-  <!-- Footer links -->
-  <footer>
-    <a href="#" id="helpLink">Help</a> |
-    <a href="#" id="privacyLink">Privacy</a> |
-    <a href="#" id="feedbackLink">Feedback</a>
-  </footer>
-<input type="checkbox" id="protection-toggle" checked />
-<select id="alert-sensitivity">
-  <option value="high">High - Strict</option>
-  <option value="medium" selected>Medium - Moderate risk+</option>
-  <option value="low">Low - Lenient</option>
-</select>
-<button id="report-page">Report Current Page</button>
-
-<!-- Stats -->
-<div id="listings-count">0</div>
-<div id="fraud-count">0</div>
-<div id="reports-count">0</div>
-
-  <!-- Scripts -->
   <script src="popup.js"></script>
 </body>
 </html>
