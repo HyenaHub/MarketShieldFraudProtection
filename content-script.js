@@ -1,49 +1,94 @@
-// --- Add flags beside listings ---
-function flagListings() {
-  const listings = document.querySelectorAll("a[href*='/marketplace/item/']");
-  
-  listings.forEach((listing) => {
-    if (listing.dataset.marketshieldFlagged) return; // avoid duplicate
+// content-script.js
 
-    const risk = Math.random(); // simulate risk score (replace with backend)
-    let color = "green";
-    if (risk > 0.7) color = "red";
-    else if (risk > 0.4) color = "yellow";
+// === CONFIG ===
+const API_BASE = "https://your-webapp.com/api"; // Change this to your backend endpoint
 
-    const flag = document.createElement("span");
-    flag.textContent = " ●";
-    flag.style.color = color;
-    flag.style.fontWeight = "bold";
-    listing.appendChild(flag);
+// Utility to create a flag element
+function createFlag(color, tooltip) {
+  const flag = document.createElement("span");
+  flag.textContent = "⚑"; // Flag icon
+  flag.style.color = color;
+  flag.style.fontSize = "18px";
+  flag.style.marginLeft = "6px";
+  flag.style.cursor = "pointer";
+  flag.title = tooltip;
+  return flag;
+}
 
+// Example fraud check logic (replace with real checks)
+function analyzeListing(listingEl) {
+  const text = listingEl.innerText.toLowerCase();
+
+  if (text.includes("too good to be true") || text.includes("scam")) {
+    return { risk: "high", color: "red", message: "High risk of fraud" };
+  } else if (text.includes("cheap") || text.includes("urgent")) {
+    return { risk: "medium", color: "orange", message: "Suspicious listing" };
+  } else {
+    return { risk: "low", color: "green", message: "Looks safe" };
+  }
+}
+
+// Inject flags into listings
+function injectFlags() {
+  const listings = document.querySelectorAll('[role="article"]'); // FB Marketplace listings
+
+  listings.forEach(listing => {
+    if (listing.dataset.marketshieldFlagged) return; // Prevent duplicate flags
     listing.dataset.marketshieldFlagged = "true";
+
+    const result = analyzeListing(listing);
+    const flag = createFlag(result.color, result.message);
+
+    // Append flag near title or price
+    const header = listing.querySelector("span, h2, h3");
+    if (header) {
+      header.appendChild(flag);
+    }
   });
 }
 
-// Run flags on load and mutation observer
-flagListings();
-const observer = new MutationObserver(flagListings);
+// Mutation observer to watch for new listings
+const observer = new MutationObserver(() => {
+  injectFlags();
+});
+
 observer.observe(document.body, { childList: true, subtree: true });
 
-// --- Handle messages from popup.js ---
+// Initial injection
+injectFlags();
+
+// === Handle messages from popup.js ===
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === "reportPage") {
-    const pageUrl = window.location.href;
-    
-    // Send to backend (replace with your real API endpoint)
-    fetch("https://your-backend.com/api/report", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url: pageUrl, timestamp: Date.now() })
-    })
-    .then(res => res.json())
-    .then(() => {
-      sendResponse({ success: true });
-    })
-    .catch(() => {
-      sendResponse({ success: false });
+  if (message.action === "reportCurrentPage") {
+    const url = window.location.href;
+
+    // Collect all flagged listings
+    const listings = [];
+    document.querySelectorAll('[role="article"]').forEach(listing => {
+      const analysis = analyzeListing(listing);
+      listings.push({
+        text: listing.innerText.slice(0, 200), // snippet
+        risk: analysis.risk,
+        message: analysis.message
+      });
     });
 
-    return true; // keep channel open for async response
+    // Send to backend
+    fetch(`${API_BASE}/report`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ page: url, listings })
+    })
+      .then(res => res.json())
+      .then(data => {
+        console.log("Report sent:", data);
+        sendResponse({ success: true, data });
+      })
+      .catch(err => {
+        console.error("Error sending report:", err);
+        sendResponse({ success: false, error: err });
+      });
+
+    return true; // Keep channel open for async sendResponse
   }
 });
